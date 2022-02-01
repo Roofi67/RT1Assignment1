@@ -10,6 +10,9 @@ To run one or more scripts in the simulator use run.py, passing it the file nam
 `python run.py assignment.py`
 # Robot API
 The API for controlling a simulated robot is designed to be as similar as possible to the [SR API][sr-api].
+<img width="1192" alt="arena" src="https://user-images.githubusercontent.com/95746070/151961449-1b3a6b80-e540-42f0-a785-577da302496f.png">
+
+
 ### Motors
 The simulated robot has two motors configured for skid steering, connected to a two-output Motor Board. The left motor is connected to output `0` and the right motor to output `1`.
 The Motor Board API is identical to that of the SR API, except that motor boards cannot be addressed by serial number. So, to turn on the spot at one quarter of full power, one might write the following: <br />
@@ -186,7 +189,9 @@ if dist_silver<silver_th and dist_silver!=-1:
 	
 main()
 ```
-
+## Possible Improvements
+- One possible improvement is that robot should be able to gather the information of silver token from a large distance and direct it towards the token without deviating from a straight line
+- Another addition is that robot should release the silver token at the same position which is at the center of maze and run smoothly in the center
 
 
 
