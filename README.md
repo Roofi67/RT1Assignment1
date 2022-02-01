@@ -56,5 +56,156 @@ Arguments:<br />
   
 The `turn(speed , seconds)` sets an angular velocity to the robot resulting in a rotation around the y axis (perpendicular to the map). To achieve this behavior, the function makes the robot's motors run at an opposite speed for a certain amount of time.
 Arguments:<br />
-    • speed: represents the module of the speed at which the wheels will spin. To make the robot spin around its vertical axis, the velocity of the spin assigned to the right wheel is opposite to the velocity of the left one. If the `speed` argument is `positive` the rotation will be counter-clockwise. Given a `negative` speed, the robot will rotate `clockwise`.
+    • speed: represents the module of the speed at which the wheels will spin. To make the robot spin around its vertical axis, the velocity of the spin assigned to the right wheel is opposite to the velocity of the left one. If the `speed` argument is `positive` the rotation will be counter-clockwise. Given a `negative` speed, the robot will rotate `clockwise`.<br />
     • second: represents the time interval in seconds [s] during which the wheels will spin.
+    
+ ### find_silver_token()
+ The find_silver_token() function is used to study all the silver tokens that are around the robot. The function checks all the tokens that the robot, we can say, sees thanks to R.see() method. The function only takes the tokens that are closer than 3 (which is pretty close inside the enviroment) and inside the angle φ, which is -70°<φ<70°. Obviously, as long as we want only silver tokens, we want to have as marker_type MARKER_TOKEN_SILVER, because it's what it differentiates it from the golden ones.<br />
+
+Arguments<br />
+None.<br />
+Returns<br />
+Returns distance of the closest silver token and angle between the robot and the closest silver token (dist, rot_y).<br />
+Code
+```ruby
+def find_silver_token():
+    dist=3
+    for token in R.see():
+        if token.dist < dist and token.info.marker_type is MARKER_TOKEN_SILVER and -70<token.rot_y<70:
+            dist=token.dist
+	    rot_y=token.rot_y
+    if dist==3:
+	return -1, -1
+    else:
+   	return dist, rot_y
+```
+### find_golden_token()
+The find_golden_token() function is crucial for the movement of the robot close to a wall. As the find_silver_token() function, it uses the same methods and code structure of it. We can underline the paramaters that change which are the dist which is going to be higher in order to always check where is the closest golden box (dist=100), the angle which is going to be more limited (-40°<φ<40°) because we want to check only the golden boxes in front of the robot, and, of course, the marker_type which is going to be MARKER_TOKEN_GOLD.
+
+Arguments<br />
+    None.<br />
+Returns<br />
+    Returns distance of the closest golden token and angle between the robot and the closest golden token (dist, rot_y).<br />
+Code<br />
+```ruby
+def find_golden_token():
+    dist=100
+    for token in R.see():
+        if token.dist < dist and token.info.marker_type is MARKER_TOKEN_GOLD and -40<token.rot_y<40:
+            dist=token.dist
+	    rot_y=token.rot_y
+    if dist==100:
+	return -1, -1
+    else:
+   	return dist, rot_y
+```
+### find_golden_token_left()
+The find_golden_token_left() function is used to check how far is the wall of golden boxes on the left, used with its sister, find_golden_token_right() we can check where do we have to turn when getting closer to a wall. Nothing is really new because again only one important parameter changes which is the angle, which now is -105°<φ<-75°, as the angle is negative on the left.<br />
+
+Arguments<br />
+None.<br />
+Returns<br />
+Returns distance of the closest golden token on the left (dist).<br />
+Code<br />
+```ruby
+def find_golden_token_left():
+    dist=100
+    for token in R.see():
+        if token.dist < dist and token.info.marker_type is MARKER_TOKEN_GOLD and -105<token.rot_y<-75:
+            dist=token.dist
+    if dist==100:
+	return -1
+    else:
+   	return dist
+```
+### find_golden_token_right()
+The find_golden_token_right() function is identical to the one just explained, it only changes the angle which is 75°<φ<105°, as the angle is positive on the right.<br />
+
+Arguments<br />
+None.<br />
+Returns<br />
+Returns distance of the closest golden token on the right (dist).<br />
+Code<br />
+```ruby
+def find_golden_token_right():
+
+    dist=100
+    for token in R.see():
+        if token.dist < dist and token.info.marker_type is MARKER_TOKEN_GOLD and 75<token.rot_y<105:
+            dist=token.dist
+    if dist==100:
+	return -1
+    else:
+   	return dist
+```
+## Main function 
+
+With the help of Flow chart it can be seen that program flow is quite smple. 
+![Robot (1)](https://user-images.githubusercontent.com/95746070/151898739-2269086b-04f9-48d0-b95d-12dd751594dd.png)
+
+We nee to run the code endlessly therefore for every true value of 1 robot will keep doing the given task unless there is no error.With the following command functions we can get the distance information after some instances
+```ruby
+while(1):
+
+	dist_silver, rot_silver = find_silver_token()
+	dist_gold, rot_gold =find_golden_token()
+	left_dist=find_golden_token_left()
+	right_dist=find_golden_token_right()
+```
+By setting the threshold values silver_th and gold_th we can easily move the robot in the maze with high speed unless it reaches closer toany one of the token.
+```ruby
+if (dist_gold>gold_th and dist_silver>silver_th) or (dist_gold>gold_th and dist_silver==-1):
+			print("Drive straight 0.05 seconds")
+			drive(100,0.05)
+```
+Now, when the robot reaches close to the wall or golden token, which is detected with the front visual angles width of 80 degrees(-40 to 40 degrees). The golden token or wall can be deflected by using the functions below where left side and right side of robots are compared and then turned the robot towards the side whose distance is greater so that the robot can run without hitting the walls.
+```ruby
+if dist_gold<gold_th and dist_gold!=-1:
+			if left_dist>right_dist:
+				turn(-25, 0.1)
+			elif right_dist>left_dist:
+				turn(25, 0.1)
+```
+Hence the main part of the code when the robot arrives close to the silver token. When we are within the threshold(silver_th) of silver token firstly let's check if the robot is aligned with the token or not. If the robot is nor aligned so we aligned it and then check weather the robot is really close(d_th) to grab the toke and if it not then move the robot a little further. Now we can finally grab the token,turn back,move a little bit further, release the token, move back again and then turn back again to move to the next token
+```ruby
+if dist_silver<silver_th and dist_silver!=-1:
+			if dist_silver < d_th:
+				if R.grab():
+                    print("Gotcha!")
+                    turn(20, 3)
+                    drive(20, 0.9)
+                    R.release()
+                    drive(-20,0.9)
+                    turn(-20,3)
+	    		elif -a_th<=rot_silver<=a_th:
+	    			drive(40, 0.1)
+		    	elif rot_silver < -a_th:
+				    turn(-10, 0.1)
+			    elif rot_silver > a_th:
+				    turn(10, 0.1)
+	
+main()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
