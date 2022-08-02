@@ -7,7 +7,7 @@ The aim of this project was to code a Python script capable of making an holonom
     • And once the robot will get close enough to a silver token, it should grab it and move it behind itself.
 ## Running the Program
 To run one or more scripts in the simulator use run.py, passing it the file names.<br />
-`python run.py assignment.py`
+```python2 run.py assignment.py```
 # Robot API
 The API for controlling a simulated robot is designed to be as similar as possible to the [SR API][sr-api].
 <img width="1192" alt="arena" src="https://user-images.githubusercontent.com/95746070/151961449-1b3a6b80-e540-42f0-a785-577da302496f.png">
@@ -192,25 +192,3 @@ main()
 ## Possible Improvements
 - One possible improvement is that robot should be able to gather the information of silver token from a large distance and direct it towards the token without deviating from a straight line
 - Another addition is that robot should release the silver token at the same position which is at the center of maze and run smoothly in the center
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
